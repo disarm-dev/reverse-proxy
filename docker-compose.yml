@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+        portainer:
+                image: portainer/portainer
+                ports:
+                        - "9000:9000"
+                command: -H unix:///var/run/docker.sock
+                volumes:
+                        - /var/run/docker.sock:/var/run/docker.sock
+                        - portainer_data:/data
+                labels:
+                        - "traefik.frontend.rule=Path:/port"
+        reverse-proxy:
+                image: traefik # The official Traefik docker image
+                command: --api --docker # Enables the web UI and tells Traefik to listen to docker
+                ports:
+                        - "80:80"     # The HTTP port
+                        - "8080:8080" # The Web UI (enabled by --api)
+                volumes:
+                        - /var/run/docker.sock:/var/run/docker.sock # So that Traefik can listen to the Docker events
+        whoami:
+                image: emilevauge/whoami # A container that exposes an API to show its IP address
+                labels:
+                        - "traefik.frontend.rule=Path:/algo"
+        echo:
+                image: paddycarey/go-echo
+                labels:
+                        - "traefik.frontend.rule=Path:/echo"
+volumes:
+        portainer_data:
