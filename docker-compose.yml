@@ -3,8 +3,6 @@ version: '3'
 services:
         portainer:
                 image: portainer/portainer
-                ports:
-                        - "9000:9000"
                 command: -H unix:///var/run/docker.sock
                 volumes:
                         - /var/run/docker.sock:/var/run/docker.sock
@@ -12,17 +10,17 @@ services:
                 labels:
                         - "traefik.frontend.rule=Host:port.srv.tmpry.com"
         traefik:
-                image: traefik # The official Traefik docker image
+                image: traefik
                 command: --api --docker # Enables the web UI and tells Traefik to listen to docker
                 ports:
-                        - "80:80"     # The HTTP port
-                        - "8080:8080" # The Web UI (enabled by --api)
+                        - "80:80"     # The HTTP port, not the web UI port
                 volumes:
                         - /var/run/docker.sock:/var/run/docker.sock # So that Traefik can listen to the Docker events
                 labels:
                         - "traefik.frontend.rule=Host:traefik.srv.tmpry.com"
+                        - "traefik.port=8080"
         whoami:
-                image: emilevauge/whoami # A container that exposes an API to show its IP address
+                image: emilevauge/whoami
                 labels:
                         - "traefik.frontend.rule=Host:whoami.srv.tmpry.com"
         echo:
@@ -32,9 +30,13 @@ services:
         transfersh:
                 image: dutchcoders/transfer.sh:latest
                 command: --provider local --basedir /tmp/
-                ports:
-                        - "8081:8080"
                 labels:
                         - "traefik.frontend.rule=Host:transfer.srv.tmpry.com"
+                        - "traefik.port=8080"
+        requestbin:
+                image: agaveapi/requestbin:master
+                labels:
+                        - "traefik.frontend.rule=Host:req.srv.tmpry.com"
+                        - "traefik.port=5000"
 volumes:
         portainer_data:
