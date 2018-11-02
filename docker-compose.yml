@@ -33,10 +33,5 @@ services:
                 labels:
                         - "traefik.frontend.rule=Host:transfer.srv.tmpry.com"
                         - "traefik.port=8080"
-        requestbin:
-                image: agaveapi/requestbin:master
-                labels:
-                        - "traefik.frontend.rule=Host:req.srv.tmpry.com"
-                        - "traefik.port=5000"
 volumes:
         portainer_data:
